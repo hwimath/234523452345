@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>어근 : 많을 다 (多) - 초등어휘 단어 게임</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #FFF5EE;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FFA07A;
+        }
+        .hidden {
+            display: none;
+        }
+        .section {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FAEBD7;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #FFA07A;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 15px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #FF6347;
+        }
+        .quiz-option {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 24px;
+            color: #32CD32;
+        }
+        #incorrectAnswers {
+            text-align: left;
+            margin-top: 20px;
+        }
+        #incorrectAnswers p {
+            color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✨ 어근 : 많을 다 (多) - 초등어휘 단어 게임 ✨</h1>
+
+<div id="studySection" class="section">
+    <div id="studyContent">
+        <!-- Study content will be injected here -->
+    </div>
+    <button class="button" id="nextStudyBtn">다음</button>
+</div>
+
+<div id="quizSection" class="section hidden">
+    <h2>단어 퀴즈</h2>
+    <div id="quizContent">
+        <!-- Quiz content will be injected here -->
+    </div>
+    <button class="button" id="nextQuizBtn">다음</button>
+    <button class="button hidden" id="submitQuizBtn">제출</button>
+</div>
+
+<div id="scoreSection" class="section hidden">
+    <h2>🎉 점수 🎉</h2>
+    <p id="score">0 / 10</p>
+    <div id="incorrectAnswers">
+        <!-- Incorrect answers will be displayed here -->
+    </div>
+    <button class="button" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+// 데이터 정의
+const words = [
+    { word: "다수", definition: "많은 수, 대다수." },
+    { word: "다양", definition: "형태나 종류가 여러 가지인." },
+    { word: "다량", definition: "매우 많은 양." },
+    { word: "다면", definition: "여러 가지 면이나 측면." },
+    { word: "다방면", definition: "여러 방향이나 측면." },
+    { word: "다문화", definition: "여러 문화가 공존하는." },
+    { word: "다목적", definition: "여러 목적에 사용되는." },
+    { word: "다기능", definition: "여러 기능을 가진." },
+    { word: "다재다능", definition: "여러 가지 재능을 가진." },
+    { word: "다작", definition: "많은 작품을 만드는." }
+];
+
+const sentences = {
+    "다수": [
+        "그는 다수의 친구를 가지고 있다.",
+        "회의에 다수가 참석했다.",
+        "다수의 사람들이 그 영화를 좋아했다."
+    ],
+    "다양": [
+        "그림이 다양해서 보기 좋았다.",
+        "다양한 색깔의 꽃이 피었다.",
+        "그는 다양한 취미를 가지고 있다."
+    ],
+    "다량": [
+        "이 제품은 다량으로 구매할 수 있다.",
+        "다량의 물을 마셔야 건강에 좋아.",
+        "다량의 음식을 준비했다."
+    ],
+    "다면": [
+        "이 문제는 여러 면에서 생각해봐야 한다.",
+        "그의 이야기는 다면적이다.",
+        "다면적으로 접근해야 한다."
+    ],
+    "다방면": [
+        "그는 다방면으로 재능이 있다.",
+        "다방면에서 도움을 주었다.",
+        "다방면의 지식을 쌓았다."
+    ],
+    "다문화": [
+        "도시는 다문화 사회이다.",
+        "다문화 교육이 중요하다.",
+        "다문화 축제가 열렸다."
+    ],
+    "다목적": [
+        "이 기기는 다목적으로 사용할 수 있다.",
+        "다목적 공간을 만들었다.",
+        "다목적 용도로 설계되었다."
+    ],
+    "다기능": [
+        "이 제품은 다기능을 가지고 있다.",
+        "다기능 프린터를 샀다.",
+        "다기능 소프트웨어를 사용한다."
+    ],
+    "다재다능": [
+        "그는 다재다능한 배우다.",
+        "다재다능한 친구가 필요해.",
+        "그녀는 다재다능한 아티스트다."
+    ],
+    "다작": [
+        "그는 다작의 작가이다.",
+        "다작 작곡가로 유명하다.",
+        "그의 다작은 많은 사람들에게 사랑받고 있다."
+    ]
+};
+
+const quizQuestions = [
+    {
+        question: "1. 그는 ____의 친구를 가지고 있다.",
+        options: ["다수", "다양"],
+        correctAnswer: "다수"
+    },
+    {
+        question: "2. 그림이 ____해서 보기 좋았다.",
+        options: ["다양", "다재다능"],
+        correctAnswer: "다양"
+    },
+    {
+        question: "3. 이 제품은 ____으로 구매할 수 있다.",
+        options: ["다량", "다목적"],
+        correctAnswer: "다량"
+    },
+    {
+        question: "4. 이 문제는 여러 ____에서 생각해봐야 한다.",
+        options: ["다면", "다방면"],
+        correctAnswer: "다면"
+    },
+    {
+        question: "5. 그는 ____으로 재능이 있다.",
+        options: ["다방면", "다문화"],
+        correctAnswer: "다방면"
+    },
+    {
+        question: "6. 도시는 ____ 사회이다.",
+        options: ["다문화", "다목적"],
+        correctAnswer: "다문화"
+    },
+    {
+        question: "7. 이 기기는 ____으로 사용할 수 있다.",
+        options: ["다목적", "다재다능"],
+        correctAnswer: "다목적"
+    },
+    {
+        question: "8. 이 제품은 ____을 가지고 있다.",
+        options: ["다기능", "다재다능"],
+        correctAnswer: "다기능"
+    },
+    {
+        question: "9. 그녀는 ____한 아티스트다.",
+        options: ["다재다능", "다작"],
+        correctAnswer: "다재다능"
+    },
+    {
+        question: "10. 그는 ____의 작가이다.",
+        options: ["다작", "다양"],
+        correctAnswer: "다작"
+    }
+];
+
+// 상태 변수
+let currentWordIndex = 0;
+let currentQuizIndex = 0;
+let score = 0;
+let incorrectAnswers = [];
+
+// 초기화 함수
+function showDefinition() {
+    if (currentWordIndex < words.length) {
+        const word = words[currentWordIndex];
+        document.getElementById('studyContent').innerHTML = `
+            <h2>단어 뜻 배우기 (어근: 많을 다)</h2>
+            <h3>${word.word}</h3>
+            <p>${word.definition}</p>
+        `;
+    } else {
+        // 모든 단어 학습이 끝나면 퀴즈 시작
+        document.getElementById('studySection').classList.add('hidden');
+        initQuiz();
+        document.getElementById('quizSection').classList.remove('hidden');
+    }
+}
+
+function showSentences() {
+    const word = words[currentWordIndex];
+    const sentenceList = sentences[word.word];
+    let sentencesHTML = `<h2>예문 배우기 (어근: 많을 다)</h2><h3>${word.word}</h3>`;
+    sentenceList.forEach(sentence => {
+        sentencesHTML += `<p>• ${sentence}</p>`;
+    });
+    document.getElementById('studyContent').innerHTML = sentencesHTML;
+}
+
+// 버튼 이벤트 리스너
+document.getElementById('nextStudyBtn').addEventListener('click', () => {
+    if (document.getElementById('studyContent').innerHTML.includes('단어 뜻 배우기')) {
+        showSentences();
+    } else {
+        currentWordIndex++;
+        showDefinition();
+    }
+});
+
+// 옵션 섞기 함수
+function shuffleOptions(options) {
+    let shuffled = options.slice(); // 복사본 생성
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// 퀴즈 함수
+function initQuiz() {
+    if (currentQuizIndex < quizQuestions.length) {
+        const q = quizQuestions[currentQuizIndex];
+        const shuffledOptions = shuffleOptions(q.options);
+        document.getElementById('quizContent').innerHTML = `
+            <p>${q.question}</p>
+            ${shuffledOptions.map((option, index) => `
+                <label class="quiz-option">
+                    <input type="radio" name="quiz${currentQuizIndex}" value="${option}">
+                    ${option}
+                </label>
+            `).join('')}
+        `;
+        // Toggle buttons
+        if (currentQuizIndex === quizQuestions.length - 1) {
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+            document.getElementById('submitQuizBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+    }
+}
+
+document.getElementById('nextQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        initQuiz();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+document.getElementById('submitQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        showScore();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+function showScore() {
+    document.getElementById('quizSection').classList.add('hidden');
+    document.getElementById('score').innerText = `${score} / ${quizQuestions.length}`;
+    if (incorrectAnswers.length > 0) {
+        let incorrectHTML = "<h3>틀린 문제</h3>";
+        incorrectAnswers.forEach(item => {
+            incorrectHTML += `
+                <p><strong>문제:</strong> ${item.question}</p>
+                <p><strong>당신의 답:</strong> ${item.yourAnswer}</p>
+                <p><strong>정답:</strong> ${item.correctAnswer}</p>
+                <hr>
+            `;
+        });
+        document.getElementById('incorrectAnswers').innerHTML = incorrectHTML;
+    } else {
+        document.getElementById('incorrectAnswers').innerHTML = "<p>모든 문제를 맞추셨습니다! 훌륭해요! 🎉</p>";
+    }
+    document.getElementById('scoreSection').classList.remove('hidden');
+}
+
+// 초기화 시작
+showDefinition();
+</script>
+
+</body>
+</html>
